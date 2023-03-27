@@ -22,20 +22,23 @@ public class MedicoController {
 
     @PostMapping("/cadastro")
     @Transactional
-    public void cadastrar(@RequestBody @Valid DadosCadastroMedico json){
+    public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroMedico json){
         repo.save(new Medico(json));
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/listagem")
-    public Page<DadosListagemMedico> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao){
-        return repo.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
+    public ResponseEntity<Page<DadosListagemMedico>> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao){
+        var page = repo.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
+        return ResponseEntity.ok(page);
     }
 
-    @PutMapping("/editar")
+    @PutMapping("/atualizar")
     @Transactional
-    public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico json){
+    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoMedico json){
         var medico = repo.getReferenceById(json.id());
         medico.atualizarMedico(json);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete/{id}")
